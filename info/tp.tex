@@ -1,0 +1,127 @@
+\documentclass[a4paper,spanish]{article}
+
+\usepackage{url}
+\usepackage{verbatim}
+
+\input{preambulo}
+
+\hyphenation{ob-te-ner}
+
+\begin{document}
+
+\input{caratula}
+
+%\tableofcontents
+
+%\pagebreak
+
+\section{Introducci'on}
+\subsection{`? Por qu\'e Spike-Sorting?}
+
+\subsection{Temas abarcados en la pr\'actica}
+
+\subsection{Objetivos}
+
+\section{Desarrollo}
+\subsection{Datos, an\'alisis}
+\subsection{Filtering}
+\subsection{Feature an\'alisis}
+\subsection{Clustering}
+
+
+\section{La Pr\'actica}
+\subsection{Problema 1}
+En este problema se pide graficar un dataset que tiene la siguiente estructura:
+\begin{tabular}{ c | c | c | c}
+	spikes & cluster\_class & inspk & par \\
+\end{tabular}
+
+Y analizar la cantidad de neuronas que podr\'ian encontrarse en dichos datos.
+
+Comenzamos trabajando sobre la variable spikes. Entendemos que estos datos ya se encuentran:
+\begin{itemize}
+	\item Filtrados
+	\item Ya se ha hecho un trabajo de Spike detection (con Amplitude Threshold o alg\'un m\'etodo similar).  
+\end{itemize}
+
+
+El problema de Spike-Sorting, a grandes rasgos, trata de mapear un tren de spikes en m\'ultiples canales de medici\'on con el de una sola neurona. Las dificultades para distinguir cada neurona en particular puede deberse a:
+\begin{itemize}
+	\item Distintos canales miden la misma neurona desde distintos lugares y distancias, mostrando distintos valores. (Quin Quiroga cita Gold et al., 2006)
+	\item La sincronizaci\'on inter-neuronal lleva a la superposici\'on de se\~nales. (Phase Synchronization).
+	\item Mala elecci\'on de par\'ametros en los procesos de Detecci\'on de Spikes y de Features.
+\end{itemize}
+
+La pregunta que subyace de este an\'alisis ser\'ia entonces ¿cuantas neuronas podemos contar a partir de los datos que tenemos?
+Sabemos que habr\'a al menos tantas neuronas como clases de features. ¿Pero cuantas m\'as habr\'a? ¿C\'omo distinguimos neuronas sincronizadas?
+
+En la figura ~\ref{fig1} podemos observar cuatro features distintos, ¿cuantos otros features no son analizables a simple vista y precisan de un proceso m\'as sofisticado? 
+
+Las preguntas que queremos responder utilizando alg\'un m\'etodo de Clustering entonces ser\'ian:
+%%%% TODO: Reforzar preguntas FLOJO
+\begin{itemize}
+	\item Cada Feature corresponde al spike-train de\textbf{una} neurona o de varias? 
+	\item Hemos distinguido \textbf{todos} los features? 
+	\item Podemos encontrar se\~ales de otras neuronas en ellos?
+\end{itemize}
+
+Poniendolo en t\'erminos de data mining, podemos armar una partici\'on de las N observaciones en K clusters donde cada observaci\'on pertenece al cluster con media m\'as cercana.
+Haciendo un an\'alisis meramente cuantitativo, podemos ver que para $N > K$, por el principio del palomar, dos observaciones pertenecer\'an al mismo cluster. Esto implica que por cada cluster, estaremos necesariamente encontrando se\~nales de varias neuronas, o bien sincronizadas, o bien que no pudimos separar en la etapa de filtrado o de detecci\'on de features.
+
+
+
+%%%% TODO: Mejorar grafico.
+\begin{figure}[htc]
+	\centering
+	\includegraphics[width=1.0\textwidth]{imgs/spikes_data_1.png}
+	\caption{Spikes por tiempo. Datos de data\_sim1.}
+	\label{fig1}
+\end{figure}
+
+
+%%%% Aca hablo de lo importante de clasificar
+
+%%% Classification is the task of learning a target function f that maps each attribute set x to one of the predefined class labels y.  The target function is also known informally as a classification model.  A classification model is useful for the following purposes.
+
+
+
+Veamos qu\'e sucede aplicando el m\'etodo de K-Means a los datos dados:
+
+%%%% TODO: Mejorar grafico.
+\begin{figure}[htc]
+	\centering
+	\includegraphics[width=1.0\textwidth]{imgs/clustering_4_data_1.png}
+	\caption{Clustering en cuatro clases los datos en data\_sim1.}
+	\label{fig2}
+\end{figure}
+
+
+%%%% Aca hablo de K-Means, propiedades, etc.
+El algor\'itmo realiza una categorizaci\'on, en un espacio de categor\'ias fijo, agrupando las observaciones seg\'un su media. Cada observaci\'on pertenecer\'a a un cluster tal que se minimice las sumas de las medias de cada cluster.
+
+
+%%%% Hablo de Confusion matrix
+%%%% Misclassification error, como estimarlo, cuan malo es
+
+
+
+
+
+
+\subsection{Problema 2}
+
+
+\begin{figure}[htc]
+	\centering
+	\includegraphics[width=1.0\textwidth]{imgs/raw_cont_data.png}
+	\caption{Datos crudos en cont\_data, dataset.}
+	\label{fig3}
+\end{figure}
+
+\begin{verbatim}
+>> graphic_wavelforms(a, kmeans(a, 8), 8);                           
+>> graphic_wavelforms(a, kmeans(a, 10), 10);
+>> a = amplitude_threshold(dat.data, dat.par.sr, std(dat.data)  * 2); 
+\end{verbatim}
+
+\end{document}
