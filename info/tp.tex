@@ -105,11 +105,27 @@ El algor\'itmo realiza una categorizaci\'on, en un espacio de categor\'ias fijo,
 
 
 
-
-
-
 \subsection{Problema 2}
 
+Amplitude Threshold + Spike Alignation
+
+Los datos que se presentan a continuaci\'on, son mediciones extracelulares filtradas. Se observaron 60 segundos de grabaci\'on extracelular con un Sample Rate de 24khz.
+Desconocemos la relaci\'on Se\~nal Ruido pero podemos observar, realizando un histograma de los datos cuales son las frecuencias con mayor aparici\'on. Si consideramos que el ruido presente tiene las siguientes caracteristicas:
+
+\begin{itemize}
+	\item La se\~al de ruido se encuentra en voltajes m\'as bajos que los spikes.
+	\item Hay una relaci\'on se\~nal ruido desfavorable. (Hay menos spikes que ruido).
+\end{itemize}
+
+Podemos entonces filtrar las se\~ales m\'as bajas que cierto threshold. El c\'omo determinar el threshold ser\'a lo que influya en:
+
+\begin{enumerate}[a.]
+	\item Falsos positivos por un threshold muy bajo (Error de tipo I).
+	\item No encontrar todos los spikes  por un threshold muy alto (Error de tipo II).
+\end{enumerate}
+
+
+Observando los datos crudos no obtenemos demasiada intuici\'on del problema.
 
 \begin{figure}[htc]
 	\centering
@@ -118,10 +134,46 @@ El algor\'itmo realiza una categorizaci\'on, en un espacio de categor\'ias fijo,
 	\label{fig3}
 \end{figure}
 
+
+En la \ref{fig4} podemos observar que la frecuencia muestral de los voltajes entre 0.25 y 2 baja. Buscaremos estos valores y filtraremos por amplitud nuestros datos.
+\begin{figure}[htc]
+	\centering
+	\includegraphics[width=1.0\textwidth]{imgs/raw_cont_data.png}
+	\caption{Histograma contdata\sim2}
+	\label{fig4}
+\end{figure}
+
+
+Implementando un algoritmo sencillo para el thresholding y alineaci\'on de los spikes, se recorre un set de datos a ventana fija  buscando un m\'aximo local. Utilizando este m\'aximo se recortar\'a la se\~nal en un entorno alrededor del punto. Considerando una duraci\'on t\'ipica por spike de entre 2 y 3 ms. por spike se toma una ventana de 2.5 ms., considerando que el Sample Rate es de 24khz, se toma una ventana de tama\~o $ fraq{2.5 * 24000}{1000}$ asim\'etrica, es decir que los samples que van desde el 0 hasta el 24 son los previos al m\'aximo local y los siguientes 36 se encontrar\'an n la cola del spike. Entonces lo que precede al m\'aximo local del spike es el primer ms. y lo que sigue detras los \'ultimos 1.5 ms. grabados. Luego de la detecci\'on del spike, se guarda en una matriz. Todas las muestras tendr\'an el mismo tama\~o (60 samples) y estar\'ian centradas.
+
+Observaremos luego que no pudieron ser centradas con un algor\'itmo tan simple.
+
+La utilizaci\'on del script es sencilla, primero cargamos los datos y luego invocamos la funci\'on.
+
 \begin{verbatim}
->> graphic_wavelforms(a, kmeans(a, 8), 8);                           
->> graphic_wavelforms(a, kmeans(a, 10), 10);
->> a = amplitude_threshold(dat.data, dat.par.sr, std(dat.data)  * 2); 
+>> d = load('contdata_sim2.mat');
+>> data = spike_detect(d.data, d.par.sr, 1, 1440000, true); 
+\end{verbatim}
+
+Los parametros con los que la invocamos se detallan a continuaci\'on:
+\begin{itemize}
+	\item La data cruda
+	\item El sample rate
+	\item A partir de qu\'e muestra.
+	\item Hasta qu\'e muestra.
+	\item Utilizar 3Std como threshold o el de la mediana propuesto por Quian Quiroga 2004.
+\end{itemize}
+
+\begin{figure}[htc]
+	\centering
+	\includegraphics[width=1.0\textwidth]{imgs/raw_cont_data.png}
+	\caption{Histograma contdata\sim2}
+	\label{fig5}
+\end{figure}
+
+\begin{verbatim}
+>> graphic_wavelforms(data, kmeans(data, 2), 2);
+
 \end{verbatim}
 
 \end{document}

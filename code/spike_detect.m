@@ -19,16 +19,15 @@ th = me +  3*st ;
 if(not(use_3sv))
 	%% What is 0.6745 ?? Maguc number!
 	crazy_crazy_qq = 0.6745;
-	th = me +  median(data / crazy_crazy_qq );
+	th = abs(5 * (me +  median(data / crazy_crazy_qq )));
 	th
 end;
 
 % Window size is divided in two, 1ms for the start potential, 1.5 ms for the remining after the peak.
 spk_dur = 2.5;
-b_peak = 1 * sr / 1000; 
+b_peak = 1.0 * sr / 1000; 
 a_peak = 1.5 * sr / 1000; 
-%b_peak = 10;
-%a_peak = 22
+
 wsize =  b_peak + a_peak;
 
 assert(mod(1 + en_i - st_i, wsize) == 0, 'Invalid window size, check for a valid window.');
